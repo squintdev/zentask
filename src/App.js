@@ -1,9 +1,29 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
 const App = () => {
-  // hooks go here
+  // hooks
   const [newTask, setNewTask] = useState('');
-  const [tasks, setTasks] = useState([]);
+
+  const [tasks, setTasks] = useState(() => {
+
+    //get stored tasks
+    const saved = localStorage.getItem('tasks');
+
+    //parse to JSON
+    const parsed = JSON.parse(saved);
+
+    //filter completed tasks from array
+    const clean = parsed.filter(checkDone);
+
+    //function for identifying complete tasks
+    function checkDone(task) {
+      return !task.done;
+    }
+
+    const initialValue = clean;
+    return initialValue || '';
+  });
+
 
   const onNewTaskChange = useCallback((event) => {
     setNewTask(event.target.value);
@@ -27,7 +47,7 @@ const App = () => {
   }, [newTask, tasks]);
 
   useEffect(() => {
-    console.log('tasks', tasks);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
   const addTask = useCallback((task, index) => (event) => {
@@ -38,14 +58,14 @@ const App = () => {
       });
       setTasks(newTasks);
   }, [tasks]);
-
+  
   // render the page
   return (
     <div className="w-full m-auto mt-10 px-4 text-center">
       <img className="m-auto w-25" src="zen-logo.png" alt="zen stack" />
       <h1 className="text-green-400 text-6xl font-bold">ZenTask</h1>
       <form onSubmit={formSubmitted} autoComplete="off">
-        <label className="block text-green-400 text-lg font-bold mb-2" htmlFor="newTask">Enter a Task and Let Go:</label>
+        <label className="block text-green-400 text-lg font-bold mb-2" htmlFor="newTask">Enter a New Task:</label>
         <input
           className="shadow appearance-none bg-green-900 border rounded w-full py-2 px-3 text-green-200 leading-tight focus:outline-none focus:shadow-outline"
           id="newTask"
@@ -53,7 +73,7 @@ const App = () => {
           value={newTask} 
           onChange={onNewTaskChange} 
         />
-        <button className="bg-green-400 hover:bg-green-700 text-green-900 hover:text-green-400 w-full font-bold py-2 px-4 mt-4 rounded">Let Go</button>
+        <button className="bg-green-400 hover:bg-green-700 text-green-900 hover:text-green-400 w-full font-bold py-2 px-4 mt-4 rounded">Add</button>
       </form>
       <ul className="mt-4 text-left">
         {tasks.map((task, index) => (
