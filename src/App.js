@@ -9,6 +9,12 @@ const App = () => {
     //get stored tasks
     const saved = localStorage.getItem('tasks');
 
+    if (saved === null){
+      console.log('null');
+      localStorage.setItem('tasks', JSON.stringify([]));
+      window.location.reload();
+    }
+
     //parse to JSON
     const parsed = JSON.parse(saved);
 
